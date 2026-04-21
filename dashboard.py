@@ -461,13 +461,6 @@ st.sidebar.write(f"**Total Users:** {len(df):,}")
 st.sidebar.write(f"**Priority Users:** {len(priority_df):,}")
 st.sidebar.write(f"**Hot Leads:** {(df['segment'] == 'HOT LEAD').sum():,}")
 
-st.sidebar.markdown("---")
-st.sidebar.subheader("System Status")
-api_status = get_api_data("/")
-if api_status:
-    st.sidebar.success("API Running")
-else:
-    st.sidebar.error("API Offline")
 
 st.sidebar.markdown("---")
 st.sidebar.caption("Built by Rakshan")
