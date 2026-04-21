@@ -163,7 +163,7 @@ if page == "Overview Dashboard":
             }
         )
         fig_segment.update_layout(showlegend=False)
-        st.plotly_chart(fig_segment, width='stretch')
+        st.plotly_chart(fig_segment, use_container_width=True)
     
     with col2:
         st.subheader("Action Distribution")
@@ -181,7 +181,7 @@ if page == "Overview Dashboard":
             }
         )
         fig_action.update_layout(showlegend=False)
-        st.plotly_chart(fig_action, width='stretch')
+        st.plotly_chart(fig_action, use_container_width=True)
     
     # Priority Distribution
     st.subheader("Priority Distribution (Top Users)")
@@ -199,7 +199,7 @@ if page == "Overview Dashboard":
         }
     )
     fig_priority.update_layout(showlegend=False)
-    st.plotly_chart(fig_priority, width='stretch')
+    st.plotly_chart(fig_priority, use_container_width=True)
 
 # Page 2: User Analysis
 elif page == "User Analysis":
@@ -219,7 +219,7 @@ elif page == "User Analysis":
         )
         fig_hist.add_vline(x=df['abandonment_score'].mean(), line_dash="dash", 
                          line_color="red", annotation_text=f"Mean: {df['abandonment_score'].mean():.3f}")
-        st.plotly_chart(fig_hist, width='stretch')
+        st.plotly_chart(fig_hist, use_container_width=True)
     
     with col2:
         st.subheader("Score Statistics")
@@ -235,7 +235,7 @@ elif page == "User Analysis":
                 f"{df['abandonment_score'].quantile(0.75):.3f}"
             ]
         }
-        st.dataframe(pd.DataFrame(stats_data), width='stretch')
+        st.dataframe(pd.DataFrame(stats_data), use_container_width=True)
     
     # Segment vs Score Box Plot
     st.subheader("Score Distribution by Segment")
@@ -251,7 +251,7 @@ elif page == "User Analysis":
             "NORMAL": "#4ECDC4"
         }
     )
-    st.plotly_chart(fig_box, width='stretch')
+    st.plotly_chart(fig_box, use_container_width=True)
 
 # Page 3: Segmentation Insights
 elif page == "Segmentation Insights":
@@ -266,12 +266,12 @@ elif page == "Segmentation Insights":
             'abandonment_score': ['count', 'mean', 'std']
         }).round(3)
         segment_analysis.columns = ['Count', 'Avg Score', 'Std Dev']
-        st.dataframe(segment_analysis, width='stretch')
+        st.dataframe(segment_analysis, use_container_width=True)
     
     with col2:
         st.subheader("Action Effectiveness")
         action_analysis = df.groupby(['segment', 'action']).size().unstack(fill_value=0)
-        st.dataframe(action_analysis, width='stretch')
+        st.dataframe(action_analysis, use_container_width=True)
     
     # Pie Charts
     col1, col2 = st.columns(2)
@@ -283,7 +283,7 @@ elif page == "Segmentation Insights":
             names=df['segment'].value_counts().index,
             title="User Segments"
         )
-        st.plotly_chart(fig_pie1, width='stretch')
+        st.plotly_chart(fig_pie1, use_container_width=True)
     
     with col2:
         st.subheader("Action Pie Chart")
@@ -292,7 +292,7 @@ elif page == "Segmentation Insights":
             names=df['action'].value_counts().index,
             title="Recommended Actions"
         )
-        st.plotly_chart(fig_pie2, width='stretch')
+        st.plotly_chart(fig_pie2, use_container_width=True)
 
 # Page 4: Priority Management
 elif page == "Priority Management":
@@ -346,11 +346,8 @@ elif page == "Priority Management":
     
     # Display filtered results
     st.dataframe(
-        filtered_priority.head(top_n).style.background_gradient(
-            subset=['abandonment_score'], 
-            cmap='Reds'
-        ),
-        width='stretch'
+        filtered_priority.head(top_n),
+        use_container_width=True
     )
     
     # Export functionality
