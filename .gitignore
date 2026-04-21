@@ -1,5 +1,6 @@
 *.csv
 *.parquet
+!sample_data.parquet
 *.png
 __pycache__/
 *.pyc
