@@ -6,6 +6,9 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+# DEMO MODE FLAG - Set to True for Streamlit Cloud deployment
+DEMO = True
+
 # Set page configuration
 st.set_page_config(
     page_title="AI Marketing Dashboard", 
@@ -29,11 +32,44 @@ st.markdown("""
 @st.cache_data
 def load_data():
     try:
-        df = pd.read_parquet("final_marketing_output.parquet")
-        priority_df = pd.read_parquet("priority_users.parquet")
-        return df, priority_df
+        if DEMO:
+            # Demo mode: Load small sample dataset
+            print("Loading demo data...")
+            try:
+                df = pd.read_parquet("sample_data.parquet")
+                # For demo mode, use same data for both main and priority datasets
+                # Sample a smaller subset for priority users to simulate prioritization
+                priority_df = df.sample(n=min(1000, len(df)), random_state=42).copy()
+                
+                # Create priority column based on abandonment scores for demo mode
+                def assign_priority(score):
+                    if score > 0.8:
+                        return "CRITICAL"
+                    elif score > 0.6:
+                        return "HIGH"
+                    elif score > 0.4:
+                        return "MEDIUM"
+                    else:
+                        return "LOW"
+                
+                priority_df['priority'] = priority_df['abandonment_score'].apply(assign_priority)
+                print(f"Demo data loaded successfully! Main: {len(df)}, Priority: {len(priority_df)}")
+                return df, priority_df
+            except FileNotFoundError:
+                st.error("Demo mode: sample_data.parquet not found. Please run create_sample_data.py first.")
+                return pd.DataFrame(), pd.DataFrame()
+        else:
+            # Production mode: Load full datasets
+            print("Loading production data...")
+            df = pd.read_parquet("final_marketing_output.parquet")
+            priority_df = pd.read_parquet("priority_users.parquet")
+            print(f"Production data loaded successfully! Main: {len(df)}, Priority: {len(priority_df)}")
+            return df, priority_df
     except FileNotFoundError as e:
         st.error(f"Data file not found: {e}")
+        return pd.DataFrame(), pd.DataFrame()
+    except Exception as e:
+        st.error(f"Error loading data: {e}")
         return pd.DataFrame(), pd.DataFrame()
 
 @st.cache_data
@@ -55,8 +91,12 @@ st.markdown("---")
 df, priority_df = load_data()
 
 if df.empty or priority_df.empty:
-    st.error("Data files not found. Please run the pipeline first:")
-    st.code("""
+    if DEMO:
+        st.error("Demo data not found. Please run:")
+        st.code("python create_sample_data.py")
+    else:
+        st.error("Data files not found. Please run the pipeline first:")
+        st.code("""
     1. python data_analysis.py
     2. python model_training.py  
     3. python prioritization.py
